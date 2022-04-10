@@ -46,7 +46,7 @@ func getInfo(skip int) (funcName, fileName string, lineNo int) {
 		fmt.Println("runtime.Caller() failed")
 		return
 	}
-	funcName = runtime.FuncForPC(pc).Name()
+	funcName = runtime.FuncForPC(pc).Name() 
 	fileName = path.Base(file)
 	funcName = strings.Split(funcName,".")[1]
 	return

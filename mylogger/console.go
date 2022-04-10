@@ -8,11 +8,11 @@ import (
 )
 
 type ConsoleLogger struct {
-	Level LogLevel
+	Level LogLevel   //实际上是unit16只不过是使用了类型别名
 }
 
 func parseLogLevel(s string) (LogLevel, error) {
-	s = strings.ToLower(s)
+	s = strings.ToLower(s) //将传进来的s参数转换为小写
 	switch s {
 	case "debug":
 		return DEBUG, nil
@@ -27,7 +27,7 @@ func parseLogLevel(s string) (LogLevel, error) {
 	case "fatal":
 		return FATAL, nil
 	default:
-		err := errors.New("无效的日志级别")
+		err := errors.New("无效的日志级别")  //使用字符串创建一个错误，这样如果代码执行不下去就报err
 		return UNKNOWN, err
 	}
 }
@@ -35,7 +35,7 @@ func parseLogLevel(s string) (LogLevel, error) {
 func NewLog(levelStr string) ConsoleLogger {
 	level, err := parseLogLevel(levelStr)
 	if err != nil {
-		panic(err)
+		panic(err) //如果到这里err不等于nil直接退出程序
 	}
 	return ConsoleLogger{
 		Level: level,
@@ -43,7 +43,9 @@ func NewLog(levelStr string) ConsoleLogger {
 }
 
 func (c ConsoleLogger) enable(LogLevel LogLevel) bool {
-
+	// str := LogLevel >= c.Level
+	// fmt.Println(str)
+	fmt.Println(LogLevel,c.Level) //1,3 返回false 就不会打印日志。
 	return LogLevel >= c.Level
 }
 

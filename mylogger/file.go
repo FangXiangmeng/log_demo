@@ -13,7 +13,7 @@ type FileLogger struct {
 	Level       LogLevel
 	filePath    string //日志文件保存路径
 	fileName    string //日志文件保存的文件名
-	fileObj     *os.File
+	fileObj     *os.File //
 	errFileObj  *os.File
 	errFileName string
 	maxFileSize int64
@@ -31,30 +31,32 @@ func NewFileLogger(levelStr, fp, fn string, maxSize int64) *FileLogger {
 		fileName:    fn,
 		maxFileSize: maxSize,
 	}
-	err = fl.initFile() //按照文件路径和文件名将文件打开
+	err = fl.initFile() //按照文件路径和文件名将文件打开和创建
 	if err != nil {
 		panic(err)
 	}
 	return fl
 }
 
+//判断文件是否存在，如果不存在就创建，如果存在就追加
 func (f *FileLogger) initFile() error {
-	fullFileName := path.Join(f.filePath, f.fileName)
+	fullFileName := path.Join(f.filePath, f.fileName)  // ./和fangxiangmeng.log 加在一起就是./fangxiangmeng.log  Join主要是路径拼接
 	fileObj, err := os.OpenFile(fullFileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Printf("open log file failed,err:%v", err)
 		return err
 	}
 
-	errFileObj, err := os.OpenFile(fullFileName+".err.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	errFileObj, err := os.OpenFile(fullFileName+".err.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644) //创建gxiangmeng.log.err.log文件
 	if err != nil {
 		fmt.Printf("open err log file failed,err:%v", err)
 		return err
 	}
+
 	//日志文件都已经打开了，
-	f.fileObj = fileObj
-	f.errFileObj = errFileObj
-	return nil
+	f.fileObj = fileObj //给f这个结构体中的fileObj对象赋值
+	f.errFileObj = errFileObj  //给f这个结构体中的errFileObj对象赋值
+	return nil //返回一个空
 }
 
 func (f *FileLogger) splitFile(file *os.File) (*os.File, error) {
@@ -85,9 +87,9 @@ func (f FileLogger) log(lv LogLevel, format string, a ...interface{}) {
 	if f.enable(lv) {
 		msg := fmt.Sprintf(format, a...)
 		now := time.Now()
-		funcName, fileName, lineNo := getInfo(3)
+		funcName, fileName, lineNo := getInfo(3)  //获取文件名字和文件行号
 		if f.checkSize(f.fileObj) {
-			newFile, err := f.splitFile(f.fileObj)
+			newFile, err := f.splitFile(f.fileObj) //用来切割文件大小。
 			if err != nil {
 				return
 			}
